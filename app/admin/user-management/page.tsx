@@ -25,6 +25,7 @@ import {
  
 type ManagedUser = {
     id: number
+    kodeUser?: string | null // Tambahkan field kodeUser (sesuaikan jika di API namanya kode_user)
     fullname: string
     email: string
     role: string
@@ -107,6 +108,7 @@ export default function UserManagementPage() {
                     <TableHeader>
                         <TableRow>
                             <TableHead>ID</TableHead>
+                            <TableHead>Kode User</TableHead>
                             <TableHead>Nama lengkap</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Role</TableHead>
@@ -117,12 +119,15 @@ export default function UserManagementPage() {
                     </TableHeader>
                     <TableBody>
                         {isLoading ? (
-                            <TableRow><TableCell colSpan={7} className="text-center">Memuat user...</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={8} className="text-center">Memuat user...</TableCell></TableRow>
                         ) : users.length === 0 ? (
-                            <TableRow><TableCell colSpan={7} className="text-center">Belum ada user.</TableCell></TableRow>
+                            <TableRow><TableCell colSpan={8} className="text-center">Belum ada user.</TableCell></TableRow>
                         ) : users.map((user) => (
                             <TableRow key={user.id}>
                                 <TableCell>{user.id}</TableCell>
+                                <TableCell className="font-mono font-medium">
+                                    {user.kodeUser ?? "-"}
+                                </TableCell>
                                 <TableCell className="font-medium">{user.fullname}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell className="capitalize">{user.role}</TableCell>
@@ -208,6 +213,7 @@ export default function UserManagementPage() {
         </Card>
     )
 }
+
 function getPageItems(currentPage: number, totalPages: number): Array<number | "ellipsis"> {
     if (totalPages <= 4) {
         return Array.from({ length: totalPages }, (_, index) => index + 1)
@@ -218,6 +224,3 @@ function getPageItems(currentPage: number, totalPages: number): Array<number | "
     }
     return [1, "ellipsis", currentPage - 1, currentPage, currentPage + 1, "ellipsis"]
 }
-
-
-

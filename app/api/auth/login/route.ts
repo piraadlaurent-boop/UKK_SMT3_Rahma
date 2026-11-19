@@ -66,4 +66,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Login gagal. Periksa koneksi database." }, { status: 500 })
   }
 }
-

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
  
 type UserFormUser = {
   id: number
+  kodeUser?: string | null
   fullname: string
   email: string
   role: string
@@ -24,6 +25,7 @@ export function UserForm({ userId }: UserFormProps) {
   const [isLoading, setIsLoading] = useState(Boolean(userId))
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
+  const [kodeUser, setKodeUser] = useState("STF0001")
   const [fullname, setFullname] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -40,7 +42,10 @@ export function UserForm({ userId }: UserFormProps) {
         if (!response.ok) throw new Error(result.error ?? "Gagal memuat user.")
  
         if (isActive) {
+          const prefix = result.user.role?.toLowerCase() === "admin" ? "ADM" : "STF"
+          const fallbackCode = `${prefix}${String(result.user.id).padStart(4, "0")}`
           setUser(result.user)
+          setKodeUser(result.user.kodeUser ?? fallbackCode)
           setFullname(result.user.fullname)
           setEmail(result.user.email)
           setRole(result.user.role)
@@ -59,6 +64,51 @@ export function UserForm({ userId }: UserFormProps) {
       isActive = false
     }
   }, [userId])
+
+  useEffect(() => {
+    if (userId) return
+
+    let isActive = true
+    const prefix = role.toLowerCase() === "admin" ? "ADM" : "STF"
+    setKodeUser(`${prefix}0001`)
+
+    async function loadNextCode() {
+      try {
+        const response = await fetch(`/api/users?page=1&pageSize=100`)
+        const result = await response.json()
+
+        if (response.ok && Array.isArray(result.users) && isActive) {
+          let maxNumber = 0
+          for (const u of result.users) {
+            const code = String(u.kodeUser ?? u.kode_user ?? "")
+            if (code.startsWith(prefix)) {
+              const num = parseInt(code.replace(prefix, ""), 10)
+              if (!isNaN(num) && num > maxNumber) {
+                maxNumber = num
+              }
+            }
+          }
+
+          if (maxNumber === 0) {
+            maxNumber = result.users.filter(
+              (u: { role?: string }) => u.role?.toLowerCase() === role.toLowerCase()
+            ).length
+          }
+
+          setKodeUser(`${prefix}${String(maxNumber + 1).padStart(4, "0")}`)
+        }
+      } catch {
+        if (isActive) {
+          setKodeUser(`${prefix}0001`)
+        }
+      }
+    }
+
+    void loadNextCode()
+    return () => {
+      isActive = false
+    }
+  }, [userId, role])
  
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -69,6 +119,7 @@ export function UserForm({ userId }: UserFormProps) {
         method: userId ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          kodeUser,
           fullname: fullname.trim(),
           email: email.trim(),
           ...(password ? { password } : {}),
@@ -100,6 +151,10 @@ export function UserForm({ userId }: UserFormProps) {
         <p className="mt-5 text-sm text-muted-foreground">Memuat user...</p>
       ) : userId && !user ? null : (
         <form onSubmit={handleSubmit} className="mt-5 grid gap-4 rounded-md border p-4 sm:grid-cols-2">
+          <div className="grid gap-1.5 sm:col-span-2">
+            <label htmlFor="kodeUser" className="text-sm font-medium">Kode user</label>
+            <Input id="kodeUser" value={kodeUser} readOnly disabled className="bg-muted font-mono" />
+          </div>
           <div className="grid gap-1.5">
             <label htmlFor="fullname" className="text-sm font-medium">Nama lengkap</label>
             <Input id="fullname" value={fullname} onChange={(event) => setFullname(event.target.value)} required maxLength={191} />
