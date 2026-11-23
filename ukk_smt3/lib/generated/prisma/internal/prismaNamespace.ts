@@ -397,7 +397,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 
 export const ModelName = {
-  User: 'User'
+  User: 'User',
+  unitFacility: 'unitFacility'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user"
+    modelProps: "user" | "unitFacility"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -483,6 +484,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    unitFacility: {
+      payload: Prisma.$unitFacilityPayload<ExtArgs>
+      fields: Prisma.unitFacilityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.unitFacilityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.unitFacilityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>
+        }
+        findFirst: {
+          args: Prisma.unitFacilityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.unitFacilityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>
+        }
+        findMany: {
+          args: Prisma.unitFacilityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>[]
+        }
+        create: {
+          args: Prisma.unitFacilityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>
+        }
+        createMany: {
+          args: Prisma.unitFacilityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.unitFacilityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>
+        }
+        update: {
+          args: Prisma.unitFacilityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>
+        }
+        deleteMany: {
+          args: Prisma.unitFacilityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.unitFacilityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.unitFacilityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$unitFacilityPayload>
+        }
+        aggregate: {
+          args: Prisma.UnitFacilityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUnitFacility>
+        }
+        groupBy: {
+          args: Prisma.unitFacilityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UnitFacilityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.unitFacilityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UnitFacilityCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -537,6 +604,14 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const UnitFacilityScalarFieldEnum = {
+  id: 'id',
+  kodeFacility: 'kodeFacility'
+} as const
+
+export type UnitFacilityScalarFieldEnum = (typeof UnitFacilityScalarFieldEnum)[keyof typeof UnitFacilityScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -563,6 +638,13 @@ export const UserOrderByRelevanceFieldEnum = {
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+export const unitFacilityOrderByRelevanceFieldEnum = {
+  kodeFacility: 'kodeFacility'
+} as const
+
+export type unitFacilityOrderByRelevanceFieldEnum = (typeof unitFacilityOrderByRelevanceFieldEnum)[keyof typeof unitFacilityOrderByRelevanceFieldEnum]
 
 
 
@@ -750,6 +832,7 @@ export interface PrismaClientOptionsWithAdapter extends PrismaClientBaseOptions 
 export type PrismaClientOptions = PrismaClientOptionsWithAccelerateUrl | PrismaClientOptionsWithAdapter
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  unitFacility?: Prisma.unitFacilityOmit
 }
 
 /* Types for Logging */

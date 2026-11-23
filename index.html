@@ -5,32 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Iot Dashboard</title>
 
-<link rel="stylesheet" href="/iot-dashboard/css/style.css">
+<link rel="stylesheet" href="../iot-dashboard/css/style.css">
 
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="brand"><div class="brand-icon">♥</div><span>IoT<span class="green">Dashboard</span></span></div>
-    <nav class="nav">
-      <button class="active" data-page="live"><span class="ico">◉</span>Live Data <span class="badge good">Hot</span></button>
-      <button data-page="settings"><span class="ico">⚙</span>Settings</button>
-      <button data-page="history"><span class="ico">↶</span>History</button>
-    </nav>
-    <!-- <div class="side-note">Crafted with <span style="color:#ff5d70">♥</span> by <b>@Rahmaa</b></div> -->
-  </aside>
+  
 
   <main>
     <div class="header">
       <div>
         <button class="btn mobile-menu" id="menuBtn">☰</button>
-        <h1>Welcome to <span class="green">Your IoT Dashboard</span></h1>
+        <h1>Welcome to <span class="green">IoT Dashboard</span></h1>
         <div class="subtitle">Simple monitoring with powerful insights • ESP32 ready</div>
       </div>
-      <div class="actions">
+      <!-- <div class="actions">
         <button class="btn hide-mobile" id="demoBtn">▶ Demo Mode</button>
         <button class="btn primary" id="connectBtn">⚡ Connect ESP32</button>
-      </div>
+      </div> -->
     </div>
 
     <section class="page active" id="live">
@@ -48,29 +40,30 @@
         <article class="card metric">
           <div class="metric-head"><div class="metric-title"><span style="color:var(--green)">🔌</span> DEVICE STATUS</div><span id="onlineBadge" class="badge good"><span class="status-dot"></span> Online</span></div>
           <div class="device-name" id="deviceName">ESP32</div>
-          <div class="meta">⌘ Firmware: <span id="firmware">v2.1.8</span></div>
-        </article>
-      </div>
+           <article class="card panel">
 
-      <!-- <div class="content">
-        <article class="card panel">
-          <div class="panel-title"><h2>Live Sensor Chart</h2><span class="meta" id="chartRange">Last 30 readings</span></div>
-          <canvas id="chart" width="900" height="300"></canvas>
-        </article>
-        <article class="card panel">
-          <div class="panel-title"><h2>Connection</h2><span id="connState" class="badge">Demo</span></div>
           <div class="meta" style="line-height:1.8">
             Dashboard menerima data JSON dari ESP32 melalui Web Serial.<br><br>
             Format yang didukung:<br>
-            <code style="color:#7de9a7">{"temperature":25.4,"humidity":61,"device":"ESP32","firmware":"v2.1.8"}</code>
+            <code style="color:#7de9a7">{"device":"ESP32","firmware":"v2.1.8"}</code>
           </div>
           <div class="setting-actions">
             <button class="btn" id="disconnectBtn">Disconnect</button>
             <button class="btn" id="clearBtn">Clear History</button>
           </div>
         </article>
+          <div class="meta">⌘ Firmware: <span id="firmware">v2.1.8</span></div>
+        </article>
+      </div>
+
+      <div class="content">
+        <!-- <article class="card panel">
+          <div class="panel-title"><h2>Live Sensor Chart</h2><span class="meta" id="chartRange">Last 30 readings</span></div>
+          <canvas id="chart" width="900" height="300"></canvas>
+        </article> -->
+       
       </div> 
-    </section>-->
+    </section>
 
     <!-- <section class="page" id="history">
       <article class="card panel">
@@ -92,7 +85,7 @@
       </article>
     </section> -->
 
-    <!-- <div style="text-align:center;color:#68758b;font-size:13px;margin:42px 0 10px">This dashboard was carefully crafted • Not just code, but <span style="color:#ff5d70">♥</span> passion</div> -->
+    <!-- <div style="text-align:center;color:#68758b;font-size:13px;margin:42px 0 10px">This dashboard was carefully crafted • Not just code, but <span style="color:#ff5d70">♥</span> passion</div>
   </main>
 </div>
 <div class="toast" id="toast"></div>

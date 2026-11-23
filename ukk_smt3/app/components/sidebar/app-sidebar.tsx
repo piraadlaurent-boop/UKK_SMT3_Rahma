@@ -72,9 +72,18 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-     
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="text-white hover:bg-pink-200 hover:text-white active:bg-pink-200"
+                  >
+                    <Link href="/admin/tabel">
+                      <UsersRound className="w-4 h-4 mr-2" />
+                      <span>Tabel</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
   
-              
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

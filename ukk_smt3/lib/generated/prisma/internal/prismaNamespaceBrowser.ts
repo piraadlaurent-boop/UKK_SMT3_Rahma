@@ -51,7 +51,8 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  User: 'User'
+  User: 'User',
+  unitFacility: 'unitFacility'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,6 +86,14 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const UnitFacilityScalarFieldEnum = {
+  id: 'id',
+  kodeFacility: 'kodeFacility'
+} as const
+
+export type UnitFacilityScalarFieldEnum = (typeof UnitFacilityScalarFieldEnum)[keyof typeof UnitFacilityScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -111,4 +120,11 @@ export const UserOrderByRelevanceFieldEnum = {
 } as const
 
 export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+export const unitFacilityOrderByRelevanceFieldEnum = {
+  kodeFacility: 'kodeFacility'
+} as const
+
+export type unitFacilityOrderByRelevanceFieldEnum = (typeof unitFacilityOrderByRelevanceFieldEnum)[keyof typeof unitFacilityOrderByRelevanceFieldEnum]
 

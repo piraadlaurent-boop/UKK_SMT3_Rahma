@@ -9,7 +9,6 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  kodeUser  String?  @unique @map("kode_user")
   fullname  String
   email     String   @unique
   password  String
@@ -17,6 +16,33 @@ model User {
   token     String?  @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  kodeUser  String?  @unique @map("kode_user")
 
   @@map("users")
+}
+
+model tbl_facility {
+  kode_facility                                                   String             @id @db.VarChar(10)
+  nama_facility                                                   String             @db.VarChar(150)
+  create_at                                                       DateTime           @db.Timestamp(0)
+  update_at                                                       DateTime           @db.Timestamp(0)
+  tbl_unit_facility_tbl_facility_kode_facilityTotbl_unit_facility tbl_unit_facility  @relation("tbl_facility_kode_facilityTotbl_unit_facility", fields: [kode_facility], references: [kode_facility], onUpdate: Restrict, map: "tbl_facility_ibfk_1")
+  tbl_unit_facility_tbl_unit_facility_kode_facilityTotbl_facility tbl_unit_facility? @relation("tbl_unit_facility_kode_facilityTotbl_facility")
+}
+
+model tbl_type_unit {
+  id_unit_type      Int                @id @default(autoincrement())
+  nama_type_unit    String             @db.VarChar(100)
+  branch_id         Int
+  create_at         DateTime           @db.Timestamp(0)
+  update_at         DateTime           @db.Timestamp(0)
+  tbl_unit_facility tbl_unit_facility?
+}
+
+model tbl_unit_facility {
+  id_unit_type                                               Int           @id
+  kode_facility                                              String?       @unique
+  tbl_facility_tbl_facility_kode_facilityTotbl_unit_facility tbl_facility? @relation("tbl_facility_kode_facilityTotbl_unit_facility")
+  tbl_type_unit                                              tbl_type_unit @relation(fields: [id_unit_type], references: [id_unit_type], onUpdate: Restrict, map: "tbl_unit_facility_ibfk_1")
+  tbl_facility_tbl_unit_facility_kode_facilityTotbl_facility tbl_facility? @relation("tbl_unit_facility_kode_facilityTotbl_facility", fields: [kode_facility], references: [kode_facility], onDelete: Restrict, onUpdate: Restrict, map: "tbl_unit_facility_ibfk_2")
 }
