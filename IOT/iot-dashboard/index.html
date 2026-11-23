@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iot Dashboard</title>
+
+<link rel="stylesheet" href="/iot-dashboard/css/style.css">
+
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-icon">♥</div><span>IoT<span class="green">Dashboard</span></span></div>
+    <nav class="nav">
+      <button class="active" data-page="live"><span class="ico">◉</span>Live Data <span class="badge good">Hot</span></button>
+      <button data-page="settings"><span class="ico">⚙</span>Settings</button>
+      <button data-page="history"><span class="ico">↶</span>History</button>
+    </nav>
+    <!-- <div class="side-note">Crafted with <span style="color:#ff5d70">♥</span> by <b>@Rahmaa</b></div> -->
+  </aside>
+
+  <main>
+    <div class="header">
+      <div>
+        <button class="btn mobile-menu" id="menuBtn">☰</button>
+        <h1>Welcome to <span class="green">Your IoT Dashboard</span></h1>
+        <div class="subtitle">Simple monitoring with powerful insights • ESP32 ready</div>
+      </div>
+      <div class="actions">
+        <button class="btn hide-mobile" id="demoBtn">▶ Demo Mode</button>
+        <button class="btn primary" id="connectBtn">⚡ Connect ESP32</button>
+      </div>
+    </div>
+
+    <section class="page active" id="live">
+      <div class="grid">
+        <article class="card metric">
+          <div class="metric-head"><div class="metric-title"><span style="color:var(--red)">♨</span> TEMPERATURE</div><span id="tempBadge" class="badge">Waiting</span></div>
+          <div class="metric-value red" id="temp">--°C</div>
+          <div class="meta" id="tempMeta">◷ Updated: --</div>
+        </article>
+        <article class="card metric">
+          <div class="metric-head"><div class="metric-title"><span style="color:var(--blue)">💧</span> HUMIDITY</div><span id="humBadge" class="badge">Stable</span></div>
+          <div class="metric-value blue" id="hum">--%</div>
+          <div class="meta">ⓘ Ideal range: 40–70%</div>
+        </article>
+        <article class="card metric">
+          <div class="metric-head"><div class="metric-title"><span style="color:var(--green)">🔌</span> DEVICE STATUS</div><span id="onlineBadge" class="badge good"><span class="status-dot"></span> Online</span></div>
+          <div class="device-name" id="deviceName">ESP32</div>
+          <div class="meta">⌘ Firmware: <span id="firmware">v2.1.8</span></div>
+        </article>
+      </div>
+
+      <!-- <div class="content">
+        <article class="card panel">
+          <div class="panel-title"><h2>Live Sensor Chart</h2><span class="meta" id="chartRange">Last 30 readings</span></div>
+          <canvas id="chart" width="900" height="300"></canvas>
+        </article>
+        <article class="card panel">
+          <div class="panel-title"><h2>Connection</h2><span id="connState" class="badge">Demo</span></div>
+          <div class="meta" style="line-height:1.8">
+            Dashboard menerima data JSON dari ESP32 melalui Web Serial.<br><br>
+            Format yang didukung:<br>
+            <code style="color:#7de9a7">{"temperature":25.4,"humidity":61,"device":"ESP32","firmware":"v2.1.8"}</code>
+          </div>
+          <div class="setting-actions">
+            <button class="btn" id="disconnectBtn">Disconnect</button>
+            <button class="btn" id="clearBtn">Clear History</button>
+          </div>
+        </article>
+      </div> 
+    </section>-->
+
+    <!-- <section class="page" id="history">
+      <article class="card panel">
+        <div class="panel-title"><h2>Sensor History</h2><button class="btn" id="exportBtn">Export CSV</button></div>
+        <div id="historyWrap"></div>
+      </article>
+    </section> -->
+
+    <!-- <section class="page" id="settings">
+      <article class="card panel">
+        <div class="panel-title"><h2>Dashboard Settings</h2><span class="badge good">Saved locally</span></div>
+        <div class="form-grid">
+          <label>Device Name<input id="setDevice" value="ESP32"></label>
+          <label>Firmware<input id="setFirmware" value="v2.1.8"></label>
+          <label>Temperature Unit<select id="setUnit"><option value="C">Celsius (°C)</option><option value="F">Fahrenheit (°F)</option></select></label>
+          <label>Refresh Interval (ms)<input id="setInterval" type="number" min="500" step="100" value="2000"></label>
+        </div>
+        <div class="setting-actions"><button class="btn primary" id="saveSettings">Save Settings</button><button class="btn" id="resetSettings">Reset</button></div>
+      </article>
+    </section> -->
+
+    <!-- <div style="text-align:center;color:#68758b;font-size:13px;margin:42px 0 10px">This dashboard was carefully crafted • Not just code, but <span style="color:#ff5d70">♥</span> passion</div> -->
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const historyData = JSON.parse(localStorage.getItem('iotHistory') || '[]');
+let port = null, reader = null, demo = true, timer = null;
+let points = historyData.slice(-30);
+let settings = JSON.parse(localStorage.getItem('iotSettings') || '{"device":"ESP32","firmware":"v2.1.8","unit":"C","interval":2000}');
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function now(){return new Date().toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function renderChart(){
+  const c=$('#chart'),ctx=c.getContext('2d'),dpr=devicePixelRatio||1;
+  const w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='#1d2940';ctx.lineWidth=1;
+  for(let i=0;i<5;i++){let y=20+i*(h-45)/4;ctx.beginPath();ctx.moveTo(45,y);ctx.lineTo(w-15,y);ctx.stroke()}
+  if(points.length<2){ctx.fillStyle='#6f7d95';ctx.font='14px system-ui';ctx.fillText('Menunggu data sensor…',45,55);return}
+  const vals=points.map(x=>x.temperature),min=Math.min(...vals)-1,max=Math.max(...vals)+1;
+  const X=i=>45+i*(w-65)/(points.length-1),Y=v=>(h-25)-(v-min)*(h-50)/(max-min||1);
+  ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(X(i),Y(p.temperature)):ctx.moveTo(X(i),Y(p.temperature)));
+  ctx.strokeStyle='#35e37b';ctx.lineWidth=3;ctx.stroke();
+  points.forEach((p,i)=>{ctx.beginPath();ctx.arc(X(i),Y(p.temperature),3,0,Math.PI*2);ctx.fillStyle='#35e37b';ctx.fill()});
+}
+function save(){localStorage.setItem('iotHistory',JSON.stringify(historyData.slice(-200)));renderHistory()}
+function addReading(data){
+  const temp=Number(data.temperature),hum=Number(data.humidity);
+  if(!Number.isFinite(temp)||!Number.isFinite(hum)) return;
+  const item={temperature:temp,humidity:hum,time:new Date().toISOString()};
+  historyData.push(item);points=historyData.slice(-30);save();
+  const unit=settings.unit;const shown=unit==='F'?(temp*9/5+32):temp;
+  $('#temp').textContent=shown.toFixed(1)+'°'+unit;
+  $('#hum').textContent=hum.toFixed(0)+'%';
+  $('#tempMeta').textContent='◷ Updated: '+now();
+  $('#tempBadge').textContent=temp>30?'Warm':temp<18?'Cool':'Normal';
+  $('#tempBadge').className='badge '+(temp>30?'warn':'good');
+  $('#humBadge').textContent=hum>=40&&hum<=70?'Stable':'Check';
+  $('#humBadge').className='badge '+(hum>=40&&hum<=70?'good':'warn');
+  if(data.device) $('#deviceName').textContent=data.device;
+  if(data.firmware) $('#firmware').textContent=data.firmware;
+  renderChart();
+}
+function renderHistory(){
+  if(!historyData.length){$('#historyWrap').innerHTML='<div class="empty">Belum ada data.</div>';return}
+  const rows=historyData.slice(-50).reverse().map(x=>`<tr><td>${new Date(x.time).toLocaleString('id-ID')}</td><td>${x.temperature.toFixed(1)} °C</td><td>${x.humidity.toFixed(0)} %</td></tr>`).join('');
+  $('#historyWrap').innerHTML=`<table><thead><tr><th>Waktu</th><th>Temperature</th><th>Humidity</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function demoTick(){
+  const last=historyData.at(-1)?.temperature ?? 25;
+  const temp=Math.max(18,Math.min(34,last+(Math.random()-.5)*1.4));
+  const hum=Math.max(35,Math.min(80,(historyData.at(-1)?.humidity ?? 58)+(Math.random()-.5)*4));
+  addReading({temperature:temp,humidity:hum,device:settings.device,firmware:settings.firmware});
+}
+function startDemo(){
+  demo=true;$('#connState').textContent='Demo';$('#connectBtn').textContent='⚡ Connect ESP32';
+  clearInterval(timer);demoTick();timer=setInterval(demoTick,settings.interval);
+}
+async function connectSerial(){
+  if(!('serial' in navigator)){toast('Browser ini belum mendukung Web Serial. Pakai Chrome/Edge desktop.');return}
+  try{
+    port=await navigator.serial.requestPort();await port.open({baudRate:115200});
+    demo=false;clearInterval(timer);$('#connState').textContent='ESP32 Connected';$('#connectBtn').textContent='✓ Connected';
+    $('#onlineBadge').innerHTML='<span class="status-dot"></span> Online';
+    const decoder=new TextDecoderStream();port.readable.pipeTo(decoder.writable);reader=decoder.readable.getReader();
+    let buffer='';
+    while(port && reader){
+      const {value,done}=await reader.read();if(done)break;
+      buffer+=value;const lines=buffer.split(/\r?\n/);buffer=lines.pop();
+      for(const line of lines){try{const data=JSON.parse(line.trim());addReading(data)}catch(e){}}
+    }
+  }catch(e){toast('Gagal menghubungkan: '+e.message);startDemo()}
+}
+async function disconnect(){
+  try{if(reader){await reader.cancel();reader.releaseLock();reader=null}if(port){await port.close();port=null}}catch(e){}
+  $('#onlineBadge').innerHTML='Offline';$('#onlineBadge').className='badge warn';startDemo();
+}
+function exportCSV(){
+  if(!historyData.length){toast('Belum ada data untuk diexport');return}
+  const csv='timestamp,temperature_c,humidity_percent\\n'+historyData.map(x=>`${x.time},${x.temperature},${x.humidity}`).join('\\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='iot-history.csv';a.click();URL.revokeObjectURL(a.href);
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$('#'+b.dataset.page).classList.add('active');$('#sidebar').classList.remove('open');if(b.dataset.page==='history')renderHistory()});
+$('#menuBtn').onclick=()=>$('#sidebar').classList.toggle('open');
+$('#demoBtn').onclick=()=>{startDemo();toast('Demo mode aktif')};
+$('#connectBtn').onclick=connectSerial;$('#disconnectBtn').onclick=disconnect;
+$('#clearBtn').onclick=()=>{historyData.length=0;points=[];save();renderChart();toast('History dihapus')};
+$('#exportBtn').onclick=exportCSV;
+$('#saveSettings').onclick=()=>{settings={device:$('#setDevice').value||'ESP32',firmware:$('#setFirmware').value||'v2.1.8',unit:$('#setUnit').value,interval:Math.max(500,Number($('#setInterval').value)||2000)};localStorage.setItem('iotSettings',JSON.stringify(settings));$('#deviceName').textContent=settings.device;$('#firmware').textContent=settings.firmware;startDemo();toast('Settings tersimpan')};
+$('#resetSettings').onclick=()=>{localStorage.removeItem('iotSettings');location.reload()};
+$('#setDevice').value=settings.device;$('#setFirmware').value=settings.firmware;$('#setUnit').value=settings.unit;$('#setInterval').value=settings.interval;
+window.addEventListener('resize',renderChart);
+renderHistory();renderChart();startDemo();
+</script>
+</body>
+</html>
